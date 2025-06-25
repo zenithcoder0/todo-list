@@ -48,6 +48,17 @@ function TodoList() {
         .catch(err => console.error("Error updating todo:", err));
     };
 
+    const deleteTodo = (id: number) => {
+        fetch(`${API_URL}/todo/${id}`, {
+            method: 'DELETE'
+        })
+        .then(res => {
+            if(!res.ok) throw new Error(`Failed to delete todo ${id}`);
+            fetchTodos();
+        })
+        .catch(err => console.error("Error deleting todo:", err));
+    }
+
 
     useEffect(() => {
         fetchTodos();
@@ -69,10 +80,11 @@ function TodoList() {
 
             <ul>
                 {todos.map(todo => (
-                    <li key={todo.id}>
+                    <ul key={todo.id}>
                         <input type="checkbox" checked={todo.isCompleted} onChange={() => toggleComplete(todo)} />
                         {todo.title}
-                    </li>
+                        <button onClick={() => deleteTodo(todo.id)} style={{marginLeft: '1rem'}}>Delete</button>
+                    </ul>
                 ))}
             </ul>
         </div>
