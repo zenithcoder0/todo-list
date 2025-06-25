@@ -29,11 +29,11 @@ namespace TodoListApp.Controllers
         }
 
         [HttpPost]
-        public ActionResult<TodoItem> Add([FromBody] string title) {
-            var newTodo = _todoService.Add(title);
+        public ActionResult<TodoItem> Add([FromBody] TodoCreateRequest request) {
+            var newTodo = _todoService.Add(request.Title);
             return CreatedAtAction(nameof(GetById), new { id = newTodo.id }, newTodo);
         }
-
+        
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] TodoItem updated) {
             var success = _todoService.Update(id, updated.Title, updated.IsCompleted);
