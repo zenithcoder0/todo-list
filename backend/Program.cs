@@ -1,8 +1,9 @@
 using TodoListApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+var port = Environment.GetEnvironmentVariables("PORT") ?? "5238";
 
-
+builder.WebHost.UseUrls($"http://*:{port}");
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSingleton<TodoService>();
