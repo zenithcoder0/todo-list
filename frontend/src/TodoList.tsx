@@ -6,6 +6,10 @@ function TodoList() {
     const [newTodo, setNewTodo] = useState('');
     const API_URL = import.meta.env.VITE_API_URL;
 
+    const [editingTodo, setEditingTodo] = useState<TodoItem | null>(null);
+    const [editedTitle, setEditedTitle] = useState('');
+
+
     const fetchTodos = () => {
         fetch(`${API_URL}/todo`, {})
         .then(res => res.json())
@@ -59,6 +63,26 @@ function TodoList() {
         .catch(err => console.error("Error deleting todo:", err));
     }
 
+    const updateTodo = () => {
+        if (!editingTodo) return;
+        const updateTodo = {
+            ...editingTodo,
+            title: editedTitle
+        };
+
+        fetch(`${API_URL}/todo/${editingTodo.id}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(updateTodo)
+        })
+        .then(res => {
+            if(!res.ok) throw new Error(`Failed to update todo`);
+            setEditingTodo(null);
+            fetchTodos();
+        })
+        .catch(err => console.error("Error updating todo:", err));
+    }
+
 
     useEffect(() => {
         fetchTodos();
@@ -83,10 +107,23 @@ function TodoList() {
                     <ul key={todo.id}>
                         <input type="checkbox" checked={todo.isCompleted} onChange={() => toggleComplete(todo)} />
                         {todo.title}
+                        <button onClick={() => {
+                            setEditingTodo(todo); 
+                            setEditedTitle(todo.title);
+                        }} style={{marginLeft: '1rem'}}>Update</button>
                         <button onClick={() => deleteTodo(todo.id)} style={{marginLeft: '1rem'}}>Delete</button>
                     </ul>
                 ))}
             </ul>
+
+            {editingTodo && (
+                <div>
+                    <h2>Update Todo Item</h2>
+                    <input type="text" value={editedTitle} onChange={e => setEditedTitle(e.target.value)} style={{ width: '100%', marginBottom: '1rem'}}/>
+                    <button onClick={() => setEditingTodo(null)}>Cancel</button>
+                    <button onClick={() => updateTodo()}>Update</button>
+                </div>
+            )}
         </div>
     )
 }
